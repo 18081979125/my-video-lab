@@ -1,0 +1,75 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>实时屏幕监控实验室</title>
+  <style>
+    body {
+      background: #101827;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 { color: #55aaff; }
+    button {
+      padding: 14px 24px;
+      margin: 10px;
+      border: 0;
+      border-radius: 10px;
+      background: #2878e8;
+      color: white;
+      font-size: 16px;
+    }
+    video {
+      width: 100%;
+      max-width: 900px;
+      background: black;
+      border-radius: 12px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>实时屏幕采集实验室</h1>
+  <p>通过浏览器授权获取屏幕画面</p>
+
+  <button id="start">开始屏幕采集</button>
+  <button id="stop">停止采集</button>
+
+  <video id="screen" autoplay playsinline muted></video>
+
+  <script>
+    const video = document.getElementById("screen");
+    let stream = null;
+
+    document.getElementById("start").onclick = async () => {
+      try {
+        stream = await navigator.mediaDevices.getDisplayMedia({
+          video: true,
+          audio: false
+        });
+
+        video.srcObject = stream;
+
+        stream.getVideoTracks()[0].onended = () => {
+          video.srcObject = null;
+          stream = null;
+        };
+      } catch (error) {
+        alert("屏幕采集未启动：" + error.message);
+      }
+    };
+
+    document.getElementById("stop").onclick = () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+        stream = null;
+        video.srcObject = null;
+      }
+    };
+  </script>
+</body>
+</html>
